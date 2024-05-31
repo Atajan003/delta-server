@@ -20,6 +20,6 @@ public class DataLogin {
     }
 
     public String getToken() {
-        return msg;
+        return token;
     }
 }

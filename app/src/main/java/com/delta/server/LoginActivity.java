@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -14,13 +15,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.delta.server.api.LoginNetwork;
+import com.delta.server.main.MainActivity;
 
 public class LoginActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private LinearLayout inputLayout;
     private TextView loginBtn;
     private EditText editPassword;
-    private SharedPreferences pref;
+    private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private final String PASSWORD_KEY = "PASSWORD";
     private final String TOKEN_KEY = "TOKEN";
@@ -40,15 +42,15 @@ public class LoginActivity extends AppCompatActivity {
 
         setConfNetwork();
 
-        checkLogin(pref.getString(PASSWORD_KEY, ""));
+        checkLogin(sharedPreferences.getString(PASSWORD_KEY, ""));
 
         setConfListener();
 
     }
 
     private void setSharedPreference() {
-        pref = getSharedPreferences(getResources().getString(R.string.app_name), MODE_PRIVATE);
-        editor = pref.edit();
+        sharedPreferences = getSharedPreferences(getResources().getString(R.string.app_name), MODE_PRIVATE);
+        editor = sharedPreferences.edit();
     }
 
 
@@ -57,6 +59,12 @@ public class LoginActivity extends AppCompatActivity {
         inputLayout = findViewById(R.id.edit_text_layout);
         loginBtn = findViewById(R.id.login_btn);
         editPassword = findViewById(R.id.edit_password);
+
+        inputLayout.setAlpha(0.5f);
+        disableEnableControls(false, inputLayout);
+
+        editPassword.setText(sharedPreferences.getString(PASSWORD_KEY, ""));
+
     }
 
 
@@ -67,11 +75,11 @@ public class LoginActivity extends AppCompatActivity {
         network = new LoginNetwork(deviceId) {
             @Override
             public void onSuccess(String token) {
+                editor.putString(TOKEN_KEY, token);
+                editor.commit();
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
-                editor.putString(TOKEN_KEY, token);
-                editor.commit();
             }
 
             @Override
@@ -82,7 +90,8 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "Code is already used", Toast.LENGTH_SHORT).show();
                 }
                 progressBar.setVisibility(View.INVISIBLE);
-                inputLayout.setVisibility(View.VISIBLE);
+                inputLayout.setAlpha(1f);
+                disableEnableControls(true, inputLayout);
             }
         };
     }
@@ -94,7 +103,8 @@ public class LoginActivity extends AppCompatActivity {
     private void setConfListener() {
         loginBtn.setOnClickListener(view -> {
             progressBar.setVisibility(View.VISIBLE);
-            inputLayout.setVisibility(View.INVISIBLE);
+            inputLayout.setAlpha(0.5f);
+            disableEnableControls(false, inputLayout);
 
             String password = editPassword.getText().toString().trim();
             editor.putString(PASSWORD_KEY, password);
@@ -103,6 +113,16 @@ public class LoginActivity extends AppCompatActivity {
 
             editPassword.setText("");
         });
+    }
+
+    private void disableEnableControls(boolean enable, ViewGroup vg) {
+        for (int i = 0; i < vg.getChildCount(); i++) {
+            View child = vg.getChildAt(i);
+            child.setEnabled(enable);
+            if (child instanceof ViewGroup) {
+                disableEnableControls(enable, (ViewGroup) child);
+            }
+        }
     }
 
 

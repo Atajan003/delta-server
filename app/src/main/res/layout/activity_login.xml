@@ -15,8 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:orientation="vertical"
-        android:paddingHorizontal="20dp"
-        android:visibility="invisible">
+        android:paddingHorizontal="20dp">
 
         <EditText
             android:id="@+id/edit_password"
@@ -24,7 +23,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/background_edit_text"
             android:gravity="start|center"
-            android:hint="PASSWORD"
+            android:hint="@string/password"
             android:inputType="textPassword"
             android:padding="10dp"
             android:textCursorDrawable="@color/white"
@@ -43,7 +42,7 @@
             android:background="@drawable/background_btn"
             android:gravity="center"
             android:padding="13dp"
-            android:text="LOGIN"
+            android:text="@string/login"
             android:textColor="@color/white"
             android:textSize="16dp"
             android:textStyle="bold"
